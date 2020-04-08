@@ -1,0 +1,13 @@
+packages/*.gz
+packages/*.tgz
+packages/*.yaml
+packages/*.yml
+images/*.qcow
+images/*.qcow2
+images/*.img
+images/*.raw
+results/*.html
+results/*.xml
+localconfig/*.rc
+localconfig/*.sh
+!localconfig/TEMPLATE*

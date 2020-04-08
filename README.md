@@ -1,79 +1,62 @@
-<!--
-Copyright 2020 ETSI
+# Vagrant Sandboxes for OSM
 
+Copyright 2020 Telefónica Investigación y Desarrollo S.A.U.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
+    http://www.apache.org/licenses/LICENSE-2.0
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-implied.
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License
--->
-# Project Title
+limitations under the License.
 
-One Paragraph of project description goes here
+## Goal
 
-## Getting Started
+The goal is adopting a methodology for local testing that is fully repeatable and well-known by the Depops MDL team in OSM.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+This means that:
 
-### Prerequisites
+- Local testers should use (and rebuild regularly) the appropriate sandbox to perform tests and/or contributions to test plans, so that potential issues can be reliably diagnosed and solved.
+- This means that all known changes in the installation procedures of any sandbox will be captured in the companion "provisioner" script (typically, `provisioner.sh`), so that the exact procedure can be well-known and testable by everyone.
+- In case something that was known to work in a sandbox started to fail:
+  - It should be reported as a bug if there were no further contributions to the sandbox, since it is likely to be a gap in the knowledge/testing of the corresponding provisioning procedure, that might have changed over time (e.g new dependencies, change of repositories, hardcoded locations, etc.)
+  - In case new contributions (e.g. new tests, new patches, etc.) were not functional in the corresponding sandbox, the contributor should review them locally first, since they are likely to have issues.
 
-What things you need to install the software and how to install them
+## Pre-requirements
 
-```
-Give examples
-```
+- VirtualBox and Vagrant locally installed.
+- Host properly configured to use SSH and Git with OSM.
+  - NOTE: In the case of a Windows host, this means:
+    - Having your SSH keys (public and private in the `%userprofile%/.ssh` folder (the one equivalent to `~/.ssh` in Linux/Mac),
+    - Having Git installed and properly configured in Windows, i.e. check that `%userprofile%/.gitconfig` exists and has the proper configuration.
+      - In particular, it is required that the `user.name` there contains your EOL account name (i.e. avoid using a full name there). Beware that only the global profile is supported.
 
-### Installing
+## Basic use of Vagrant
 
-A step by step series of examples that tell you how to get a development env running
+To build a sandbox from scratch:
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+```bash
+cd folder_of_the_sandbox
+vagrant up
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+NOTE: All the examples that follow are suppossed to be run in the same sandbox's folder.
 
-## Running the tests
+To access the VM via SSH:
 
-Explain how to run the automated tests for this system
-
-```
-Give an example
+```bash
+vagrant ssh
 ```
 
-## Deployment
+To destroy the VM:
 
-Add additional notes about how to deploy this on a live system
+```bash
+vagrant destroy
+```
 
-## Built With
+To rebuild and reprovision the VM:
 
-* [Python](www.python.org/) - The language used
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://osm.etsi.org/gitweb/?p=osm/sandboxes.git;a=tags).
-
-## License
-
-This project is licensed under the Apache2 License - see the [LICENSE.md](LICENSE) file for details
-
-## Acknowledgments
+```bash
+vagrant destroy && vagrant up
+```
