@@ -1,7 +1,6 @@
-packages/*.gz
-packages/*.tgz
-packages/*.yaml
-packages/*.yml
+packages/*
+!packages/.void
+!packages/download_packages.sh
 images/*.qcow
 images/*.qcow2
 images/*.img

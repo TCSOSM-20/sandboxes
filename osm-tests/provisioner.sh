@@ -53,6 +53,8 @@ else
     exit 1
 fi
 
+mkdir -p ${BASE_PACKAGES_FOLDER} # Folder to store collections of packages, based on env varibles
+
 # (OPTIONAL) Devops patch configuration
 if [ -f ${BASE_CONFIG_FOLDER}/patchconfig.rc ]
 then
@@ -84,6 +86,10 @@ fi
 #------------------------------------------------------------------------------------------------------
 
 # Installs OSM client
+if [ -n "${1}" ]; then  # If there is a first argument, it must be the version
+	OSM_VERSION=$1
+fi
+
 sudo sed -i "/osm-download.etsi.org/d" /etc/apt/sources.list
 wget -qO - https://osm-download.etsi.org/repository/osm/debian/ReleaseSEVEN/OSM%20ETSI%20Release%20Key.gpg | sudo apt-key add -
 sudo add-apt-repository -y "deb [arch=amd64] https://osm-download.etsi.org/repository/osm/debian/ReleaseSEVEN stable devops IM osmclient"
@@ -92,14 +98,40 @@ sudo apt-get install -y python3-pip
 sudo -H python3 -m pip install python-magic pyangbind verboselogs
 sudo apt-get install -y python3-osmclient
 
+# Checks if there is is a version indication and if it is for "master"
+if [[ -n "${OSM_VERSION}" && "${OSM_VERSION}" = "master" ]]
+then
+    sudo apt-get remove -y python3-osmclient
+    sudo apt-get install python3-pip libcurl4-openssl-dev libssl-dev
+
+    # Upgrade pip and install dependencies (python-magic, osm-im)
+    # Next instructions install the dependencies at system level with sudo -H
+    sudo -H python3 -m pip install -U pip
+    sudo -H python3 -m pip install python-magic
+    sudo -H python3 -m pip install git+https://osm.etsi.org/gerrit/osm/IM --upgrade
+
+    # Clone the osmclient repo and install OSM client from the git repo.
+    git clone https://osm.etsi.org/gerrit/osm/osmclient
+    curl -Lo osmclient/.git/hooks/commit-msg http://osm.etsi.org/gerrit/tools/hooks/commit-msg
+    chmod u+x osmclient/.git/hooks/commit-msg
+    # Install osmclient using pip3 with the --user and -e options
+    python3 -m pip install --user -e osmclient
+fi
+
 # Installs OpenStack client
 ##For Train version, uncomment the following two lines:
 ##sudo add-apt-repository -y cloud-archive:train
 ##sudo apt-get update
 sudo apt-get install -y python3-openstackclient  # Installs Queens by default
 
-# Installs Robot and all dependencies required for the tests
+# Downloads community test plan
+ssh-keyscan -p 29419 osm.etsi.org >> ~/.ssh/known_hosts
+git clone ssh://git@osm.etsi.org:29419/osm-doc/osm-tester-guide.git
 
+# Downloads community packages and puts them in the location determined by the corresponding env variable for Robot
+git clone ssh://git@osm.etsi.org:29419/vnf-onboarding/osm-packages.git ${PACKAGES_FOLDER}
+
+# Installs Robot and all dependencies required for the tests
 sudo -H python3 -m pip install --ignore-installed haikunator requests pyvcloud progressbar pathlib robotframework robotframework-seleniumlibrary robotframework-requests robotframework-SSHLibrary
 curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 sudo add-apt-repository -y "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
@@ -122,6 +154,7 @@ fi
 # Installs some additional packages to ease interactive troubleshooting
 sudo apt-get install -y osm-devops
 sudo snap install charm --classic
+sudo apt-get install -y jq
 sudo snap install yq
 
 # Copies VIM credentials in `clouds.yaml` (if applicable) to a proper location

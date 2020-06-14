@@ -33,7 +33,10 @@ export ROBOT_DEVOPS_FOLDER="${HOME}/devops/robot-systest"
 export ENVIRONMENTS_FOLDER=environments
 
 # Folder where all required packages are stored
-export PACKAGES_FOLDER="/vagrant/packages"
+export BASE_PACKAGES_FOLDER="${BASE_FOLDER}/packages"
+export PACKAGES_FOLDER="${BASE_PACKAGES_FOLDER}/osm-packages"
+#export PACKAGES_FOLDER="{BASE_FOLDER}/packages"
+#export ETSIOSM_PACKAGES_FOLDER="${PACKAGES_FOLDER}"/osm-packages
 
 # Folder where all required images are stored (intended for future use)
 export IMAGES_FOLDER="/vagrant/images"

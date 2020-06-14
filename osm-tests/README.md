@@ -21,11 +21,6 @@ limitations under the License.
         ./download_images.sh
         ```
    2. Add the corresponding VIM target to your OSM (`osm vim-create ...`).
-   3. Copy all packages (NF, NS, NSI) required for the tests to the `packages/` folder. Hint:
-      ```bash
-      cd packages
-      ./download_packages.sh
-      ```
 2. Provide credentials for your VIM+OSM environment:
    - Create/Edit `localconfig/envconfig.rc` (and `localconfig/envprovisioning.sh` if needed).
      - HINT: First time, use `localconfig/TEMPLATE-envconfig.rc` and (if needed) `localconfig/TEMPLATE-envprovisioning.sh` as templates.
@@ -37,6 +32,15 @@ limitations under the License.
    cd robot
    robot -d /vagrant/results testsuite/hackfest_basic.robot
    ```
+
+**TIP:** In case your needed to use the latest version of OSM client from master instead of the latest stable version, simply do:
+
+```bash
+export OSM_CLIENT_VERSION=master
+vagrant up
+```
+
+**Please use this option with caution, and only when absolutely required**.
 
 ## INTRODUCTION
 
@@ -88,7 +92,7 @@ In addition, the provision of the sandbox requires a number of inputs:
   - `envprovisioning.sh`, where local provisioning tasks are scripted. This file is optional.
   - `envconfig.rc`, where the DUT (VIM and OSM) are defined with environment variables.
 - All packages required for the tests are already placed at `${PACKAGES_FOLDER}`.
-  - In Vagrant, `/vagrant/packages`.
+  - In Vagrant, they are cloned into `/home/vagrant/packages/osm-packages` in the VM.
 - All images required for the tests are already placed at `${IMAGES_FOLDER}`.
   - In Vagrant, `/vagrant/images`.
   - This folder is intended for future use, but not relevant for the current test suite.
@@ -129,7 +133,8 @@ export ROBOT_DEVOPS_FOLDER="${HOME}/devops/robot-systest"
 # Folder to save alternative DUT environments (optional)
 export ENVIRONMENTS_FOLDER=environments
 # Folder where all required packages are stored
-export PACKAGES_FOLDER="/vagrant/packages"
+export BASE_PACKAGES_FOLDER="${BASE_FOLDER}/packages"
+export PACKAGES_FOLDER="${BASE_PACKAGES_FOLDER}/osm-packages"
 # Folder where all required images are stored (intended for future use)
 #export IMAGES_FOLDER="/vagrant/images"
 # Folder where test results should be exported
